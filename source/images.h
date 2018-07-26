@@ -32,12 +32,18 @@ namespace ECG {
 struct Images {
 
 static MicroBitImage& centerRing ;
-
 static MicroBitImage& middleRing ;
-
 static MicroBitImage& outerRing ;
 
 static MicroBitImage& smile ;
+
+static MicroBitImage& square_hollow ;
+static MicroBitImage& square_filled ;
+static MicroBitImage& triangle_hollow ;
+static MicroBitImage& triangle_filled ;
+
+static MicroBitImage& left_arrow ;
+static MicroBitImage& right_arrow ;
 
 } ; // struct Images
 

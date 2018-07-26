@@ -51,6 +51,7 @@ MicroBitImage _outerRing(
     "255,255,255,255,255\n"
 ) ;
 
+
 MicroBitImage _smile(
     "0,255,0,0,255,0\n"
     "0,255,0,0,255,0\n"
@@ -59,7 +60,64 @@ MicroBitImage _smile(
     "0,255,255,255,0\n"
 ) ;
 
+MicroBitImage _square_hollow(
+    "0,0,0,0,0\n"
+    "255,255,255,255,0\n"
+    "255,0,0,255,0\n"
+    "255,0,0,255,0\n"
+    "255,255,255,255,0\n"
+) ;
+
+MicroBitImage _square_filled(
+    "0,0,0,0,0\n"
+    "255,255,255,255,0\n"
+    "255,255,255,255,0\n"
+    "255,255,255,255,0\n"
+    "255,255,255,255,0\n"
+) ;
+
+
+MicroBitImage _triangle_hollow(
+    "0,0,0,0,0\n"
+    "0,0,255,0,0\n"
+    "0,255,0,255,0\n"
+    "255,0,0,0,255\n"
+    "255,255,255,255,255\n"
+) ;
+
+MicroBitImage _triangle_filled(
+    "0,0,0,0,0\n"
+    "0,0,255,0,0\n"
+    "0,255,255,255,0\n"
+    "255,255,255,255,255\n"
+    "255,255,255,255,255\n"
+) ;
+
+MicroBitImage _left_arrow(
+    "0,0,255,0,0\n"
+    "0,255,0,0,0\n"
+    "255,255,255,255,255\n"
+    "0,255,0,0,0\n"
+    "0,0,255,0,0\n"
+) ;
+
+MicroBitImage _right_arrow(
+    "0,0,255,0,0\n"
+    "0,0,0,255,0\n"
+    "255,255,255,255,255\n"
+    "0,0,0,255,0\n"
+    "0,0,255,0,0\n"
+) ;
+
 MicroBitImage& Images::centerRing = _centerRing ;
 MicroBitImage& Images::middleRing = _middleRing ;
 MicroBitImage& Images::outerRing = _outerRing ;
 MicroBitImage& Images::smile = _smile ;
+
+MicroBitImage& Images::square_hollow = _square_hollow;
+MicroBitImage& Images::square_filled= _square_filled;
+MicroBitImage& Images::triangle_hollow= _triangle_hollow;
+MicroBitImage& Images::triangle_filled= _triangle_filled;
+
+MicroBitImage& Images::left_arrow = _left_arrow ;
+MicroBitImage& Images::right_arrow = _right_arrow ;

@@ -38,30 +38,48 @@ namespace ECG {
 
 class UserNode {
 
-NodeState state ;
+private:
 
-static PacketBuffer tempPacketBuffer ;
+static NodeState state ;
+
+static PacketBuffer recvPacketBuffer ;
+
+static PacketBuffer sendPacketBuffer ;
+
+static const char * msg ;
+
+static ManagedString welcomeMessage ;
 
 public:
 
     /**
-     * Default constructor used to initialize device functions
-     */ 
+      * Default constructor used to initialize device functions
+      */ 
     UserNode() ;
 
     /**
-     * Event handler for (A)
-     */
+      * Event handler for A-D
+      */
+    void onButtonADown(MicroBitEvent e) ;
+
+    /**
+      * Event handler for A-U
+      */
     void onButtonAUp(MicroBitEvent e) ;
 
     /**
-     * Event handler for (B)
-     */ 
+      * Event handler for B-D
+      */
+    void onButtonBDown(MicroBitEvent e) ;
+
+    /**
+      * Event handler for B-U
+      */ 
     void onButtonBUp(MicroBitEvent e) ;
 
     /**
-     * Event handler for (AB)
-     */
+      * Event handler for B-D & A-D
+      */
     void onButtonABDown(MicroBitEvent e) ;
 
     /**
@@ -70,16 +88,32 @@ public:
     void onDatagramRecipt(MicroBitEvent e) ;
 
     /**
-    * Display an animation to signify the execution of a broadcast
-    * 
-    * @param msDelay: A number of milliseconds to pause between stages of the animation
-    */
-void broadcastAnimation(int msDelay) ;
+      * Display an animation to signify the execution of a broadcast
+      * 
+      * @param msDelay: A number of milliseconds to pause between stages of the animation
+      */
+    void broadcastAnimation(int msDelay) ;
     void broadcastAnimation() ;
 
     /**
-     * Primary execution loop called by main()
-     */
+      * Display an animation to signify a download of relevant data
+      * 
+      * @param msDelay: A number of milliseconds to pause between stages of the animation
+      */
+    void downloadAnimation(int msDelay) ;
+    void downloadAnimation() ;
+
+    /**
+      * Display an animation to instruct the user as to how to play the game
+      * 
+      * @param msDelay: A number of milliseconds to pause between stages of the animation
+      */
+    void newGameAnimation(int msDelay) ;
+    void newGameAnimation() ;
+
+    /**
+      * Primary execution loop called by main()
+      */
     void loop() ;
 
 } ; // class UserNode
