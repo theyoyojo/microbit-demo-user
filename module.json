@@ -1,0 +1,12 @@
+{
+  "name": "microbit-demo-user",
+  "version": "0.0.0",
+  "bin": "./source",
+  "private": true,
+  "description": "Slave node for microbit demonstration",
+  "author": "Joel Savitz",
+  "license": "MIT",
+  "dependencies": {
+    "microbit": "lancaster-university/microbit"
+  }
+}
