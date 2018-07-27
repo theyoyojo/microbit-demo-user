@@ -106,7 +106,7 @@ void UserNode::onButtonAUp(MicroBitEvent e) {
 void UserNode::onButtonBDown(MicroBitEvent e) {
     switch(_state) {
         case UNASSIGNED:
-            _state = LISTEN_A ;
+            _state = LISTEN_B ;
         case LISTEN_A:
             break ;
         case TEAM_A:
@@ -125,10 +125,11 @@ void UserNode::onButtonBUp(MicroBitEvent e) {
         case UNASSIGNED:
             break ;
         case LISTEN_A:
-            _state = UNASSIGNED ;
+            break ;
         case TEAM_A:
             break ;
         case LISTEN_B:
+            _state = UNASSIGNED ;
             break ;
         case TEAM_B:
             break ;
