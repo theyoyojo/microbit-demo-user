@@ -32,24 +32,24 @@ using namespace ECG ;
 
 MicroBit uBit ;
 
-NodeState UserNode::state = DEMO ;
+NodeState UserNode::_state = DEMO ;
 
-PacketBuffer UserNode::recvPacketBuffer(1) ;
+PacketBuffer UserNode::_recvPacketBuffer(1) ;
 
-PacketBuffer UserNode::sendPacketBuffer(1) ;
+PacketBuffer UserNode::_sendPacketBuffer(1) ;
 
-const char * UserNode::msg = "Hello, teachers!" ;
+const char * UserNode::_charMsg = "Hello, teachers!" ;
 
-ManagedString UserNode::welcomeMessage(msg) ;
+ManagedString UserNode::_strMsg(_charMsg) ;
 
 UserNode::UserNode() {
     uBit.init() ;
 
     uBit.serial.printf("constructor is called\r\n") ;
 
-    state = DEMO ;
+    _state = DEMO ;
 
-    welcomeMessage = msg ;
+    _strMsg = _charMsg ;
 
     uBit.radio.enable() ;
 
@@ -66,55 +66,55 @@ UserNode::UserNode() {
 
 void UserNode::onButtonADown(MicroBitEvent e) {
     // TODO: listen for unassign root signal while assigned
-    switch(state) {
+    switch(_state) {
         case DEMO:
             uBit.display.print("a") ;
             break ;
         case GAME_UNASSIGNED:
             uBit.display.print(ECG::Images::square_hollow) ;
-            state = GAME_LISTEN_A ;
+            _state = GAME_LISTEN_A ;
             break ;
     }
 }
 
 void UserNode::onButtonAUp(MicroBitEvent e) {
-    switch(state) {
+    switch(_state) {
         case DEMO:
             uBit.display.print("A") ;
             break ;
         case GAME_LISTEN_A:
             uBit.display.clear() ;
-            state = GAME_UNASSIGNED ;
+            _state = GAME_UNASSIGNED ;
             break ;
     }
 }
 
 void UserNode::onButtonBDown(MicroBitEvent e) {
-    switch(state) {
+    switch(_state) {
         case DEMO:
             uBit.display.print("b") ;
             break ;
         case GAME_UNASSIGNED:
             uBit.display.print(ECG::Images::triangle_hollow) ;
-            state = GAME_LISTEN_B ;
+            _state = GAME_LISTEN_B ;
             break ;
     }
 }
 
 void UserNode::onButtonBUp(MicroBitEvent e) {
-    switch(state) {
+    switch(_state) {
         case DEMO:
             uBit.display.print("B") ;
             break ;
         case GAME_LISTEN_B:
             uBit.display.clear() ;
-            state = GAME_UNASSIGNED ;
+            _state = GAME_UNASSIGNED ;
             break ;
     }
 }
 
 void UserNode::onButtonABDown(MicroBitEvent e) {
-    switch(state) {
+    switch(_state) {
         case DEMO:
             // TODO: make this block display
             broadcastAnimation() ;
@@ -124,23 +124,23 @@ void UserNode::onButtonABDown(MicroBitEvent e) {
             break ;
         case GAME_TEAM_A:
             broadcastAnimation() ;
-            sendPacketBuffer[0] = SIG_UA ;
-            uBit.radio.datagram.send(recvPacketBuffer) ;
+            _sendPacketBuffer[0] = SIG_UA ;
+            uBit.radio.datagram.send(_recvPacketBuffer) ;
             break ;
         case GAME_TEAM_B:
             broadcastAnimation() ;
-            sendPacketBuffer[0] = SIG_UB ;
-            uBit.radio.datagram.send(recvPacketBuffer) ;
+            _sendPacketBuffer[0] = SIG_UB ;
+            uBit.radio.datagram.send(_recvPacketBuffer) ;
             break ;
     }
 }
 
 void UserNode::loop() {
-    uBit.serial.printf("state = %d\r\n", state) ;
+    uBit.serial.printf("state = %d\r\n", _state) ;
     uBit.sleep(1000) ;
 
     // Execution path of this loop depends on state
-    switch (state) {
+    switch (_state) {
         case DEMO:
             uBit.serial.printf("in demo state\r\n") ;
             break ;
@@ -177,30 +177,30 @@ void UserNode::onDatagramRecipt(MicroBitEvent e) {
     uBit.serial.printf("data detected\r\n") ;
 
     // Extract signal from received packet
-    recvPacketBuffer = uBit.radio.datagram.recv() ;
+    _recvPacketBuffer = uBit.radio.datagram.recv() ;
 
-    int signal = recvPacketBuffer[0] ;
+    int signal = _recvPacketBuffer[0] ;
 
     switch(signal) {
         // Reset and demo are essentially the same
         case SIG_RR:
         case SIG_RD:
             uBit.display.clear() ;
-            state = DEMO ;
+            _state = DEMO ;
             break ;
         // Ending the game just switches player to listen mode
         case SIG_RL :
         case SIG_RGG:
-            state = LISTEN ;
+            _state = LISTEN ;
             break ;
         case SIG_RMSG:
-            state = MESSAGE ;
-            uBit.display.scroll(welcomeMessage) ;
+            _state = MESSAGE ;
+            uBit.display.scroll(_strMsg) ;
             break ;
         // Un-assigning a node is the same as starting a new game for them
         // If they are listening, that is
         case SIG_RU:
-            if (state != GAME_LISTEN_A && state != GAME_LISTEN_B) {
+            if (_state != GAME_LISTEN_A && _state != GAME_LISTEN_B) {
                 break ;
             }
             else {
@@ -208,21 +208,21 @@ void UserNode::onDatagramRecipt(MicroBitEvent e) {
             }
             break ;
         case SIG_RNG:
-            state = LISTEN ;
+            _state = LISTEN ;
             newGameAnimation() ;
-            state = GAME_UNASSIGNED ;
+            _state = GAME_UNASSIGNED ;
             break ;
         case SIG_UA:
-            if (state == GAME_LISTEN_A) {
-                state = GAME_TEAM_A ;
+            if (_state == GAME_LISTEN_A) {
+                _state = GAME_TEAM_A ;
             }
             else {
                 // If they do not consent to conversion, tolerate it
             }
             break ;
         case SIG_UB:
-            if (state == GAME_LISTEN_B) {
-                state = GAME_TEAM_B ;
+            if (_state == GAME_LISTEN_B) {
+                _state = GAME_TEAM_B ;
             }
             break ;
         default:

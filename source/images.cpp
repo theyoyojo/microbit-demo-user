@@ -109,6 +109,10 @@ MicroBitImage _right_arrow(
     "0,0,255,0,0\n"
 ) ;
 
+// Below, previously declared but undefined static
+// MicroBitImage&'s are given definitions tying them
+// to the representations above
+
 MicroBitImage& Images::centerRing = _centerRing ;
 MicroBitImage& Images::middleRing = _middleRing ;
 MicroBitImage& Images::outerRing = _outerRing ;

@@ -40,15 +40,15 @@ class UserNode {
 
 private:
 
-static NodeState state ;
+static NodeState _state ;
 
-static PacketBuffer recvPacketBuffer ;
+static PacketBuffer _recvPacketBuffer ;
 
-static PacketBuffer sendPacketBuffer ;
+static PacketBuffer _sendPacketBuffer ;
 
-static const char * msg ;
+static const char * _charMsg ;
 
-static ManagedString welcomeMessage ;
+static ManagedString _strMsg ;
 
 public:
 
