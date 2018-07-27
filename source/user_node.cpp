@@ -230,5 +230,5 @@ void UserNode::loop() {
         default:
             break ;
     }
-    uBit.sleep(1000) ;
+    uBit.sleep(500) ;
 }
