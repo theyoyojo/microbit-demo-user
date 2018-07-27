@@ -147,7 +147,6 @@ void UserNode::onDatagramRecipt(MicroBitEvent e) {
     // Radio signal handling is state-dependent
     switch(_state) {
 
-        // All deprecated signals will reset the devices
         case SIG_R:
             uBit.serial.printf("GOT SIG_R\r\n") ;
             _state = UNASSIGNED ;
@@ -189,6 +188,7 @@ void UserNode::broadcastAnimation() {
 }
 
 void UserNode::waitingForInputAnimation(int msDelay) {
+    // TODO: refactor this garbage
     if (_state != UNASSIGNED) return;
     uBit.display.print(ECG::Images::loading1) ;
     if (_state != UNASSIGNED) return;

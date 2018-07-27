@@ -123,14 +123,6 @@ public:
     void broadcastAnimation() ;
 
     /**
-      * Display an animation to signify a download of relevant data
-      * 
-      * @param msDelay: A number of milliseconds to pause between stages of the animation
-      */
-    void downloadAnimation(int msDelay) ;
-    void downloadAnimation() ;
-
-    /**
       * Display an animation to instruct the user as to how to play the game
       * 
       * @param msDelay: A number of milliseconds to pause between stages of the animation
