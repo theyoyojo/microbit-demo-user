@@ -189,16 +189,24 @@ void UserNode::broadcastAnimation() {
 }
 
 void UserNode::waitingForInputAnimation(int msDelay) {
-    uBit.display.printAsync(ECG::Images::loading1) ;
+    if (_state != UNASSIGNED) return;
+    uBit.display.print(ECG::Images::loading1) ;
+    if (_state != UNASSIGNED) return;
     uBit.sleep(msDelay) ;
 
-    uBit.display.printAsync(ECG::Images::loading2) ;
+    if (_state != UNASSIGNED) return;
+    uBit.display.print(ECG::Images::loading2) ;
+    if (_state != UNASSIGNED) return;
     uBit.sleep(msDelay) ;
 
-    uBit.display.printAsync(ECG::Images::loading3) ;
+    if (_state != UNASSIGNED) return;
+    uBit.display.print(ECG::Images::loading3) ;
+    if (_state != UNASSIGNED) return;
     uBit.sleep(msDelay) ;
 
-    uBit.display.printAsync(ECG::Images::loading4) ;
+    if (_state != UNASSIGNED) return;
+    uBit.display.print(ECG::Images::loading4) ;
+    if (_state != UNASSIGNED) return;
     uBit.sleep(msDelay) ;
 }
 
