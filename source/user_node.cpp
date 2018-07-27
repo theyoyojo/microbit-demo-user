@@ -25,33 +25,30 @@ DEALINGS IN THE SOFTWARE.
 #include "user_node.h"
 #include "signals.h"
 #include "images.h"
+#include "wait_api.h"
 
-#define DEFAULT_ANIMATION_DELAY 100
+// Default delay for animations
+#define DEFAULT_ANIMATION_DELAY 500
 
 using namespace ECG ;
 
 MicroBit uBit ;
 
-NodeState UserNode::_state = DEMO ;
+NodeState UserNode::_state ;
 
 PacketBuffer UserNode::_recvPacketBuffer(1) ;
 
 PacketBuffer UserNode::_sendPacketBuffer(1) ;
 
-const char * UserNode::_charMsg = "Hello, teachers!" ;
-
-ManagedString UserNode::_strMsg(_charMsg) ;
 
 UserNode::UserNode() {
+
+    // Device initialization
     uBit.init() ;
-
-    uBit.serial.printf("constructor is called\r\n") ;
-
-    _state = DEMO ;
-
-    _strMsg = _charMsg ;
-
     uBit.radio.enable() ;
+
+    // All nodes begin in an unassigned state
+    _state = UNASSIGNED ;
 
     // Register button handlers
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_DOWN , this, &UserNode::onButtonADown) ;
@@ -64,237 +61,174 @@ UserNode::UserNode() {
     uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, this, &UserNode::onDatagramRecipt) ;
 }
 
+void UserNode::broadcastSignal(int sig) {
+    _sendPacketBuffer[0] = sig ;
+    uBit.radio.datagram.send(_sendPacketBuffer) ;
+    broadcastAnimation() ;
+}
+
 void UserNode::onButtonADown(MicroBitEvent e) {
-    // TODO: listen for unassign root signal while assigned
     switch(_state) {
-        case DEMO:
-            uBit.display.print("a") ;
+        case UNASSIGNED:
+            _state = LISTEN_A ;
             break ;
-        case GAME_UNASSIGNED:
-            uBit.display.print(ECG::Images::square_hollow) ;
-            _state = GAME_LISTEN_A ;
+        case LISTEN_A:
+            break ;
+        case TEAM_A:
+            broadcastSignal(SIG_A) ;
+            break ;
+        case LISTEN_B:
+            break ;
+        case TEAM_B:
+            break ;
+        default:
             break ;
     }
 }
 
 void UserNode::onButtonAUp(MicroBitEvent e) {
     switch(_state) {
-        case DEMO:
-            uBit.display.print("A") ;
+        case UNASSIGNED:
             break ;
-        case GAME_LISTEN_A:
-            uBit.display.clear() ;
-            _state = GAME_UNASSIGNED ;
+        case LISTEN_A:
+            _state = UNASSIGNED ;
+        case TEAM_A:
+            break ;
+        case LISTEN_B:
+            break ;
+        case TEAM_B:
+            break ;
+        default:
             break ;
     }
 }
 
 void UserNode::onButtonBDown(MicroBitEvent e) {
     switch(_state) {
-        case DEMO:
-            uBit.display.print("b") ;
+        case UNASSIGNED:
+            _state = LISTEN_A ;
+        case LISTEN_A:
             break ;
-        case GAME_UNASSIGNED:
-            uBit.display.print(ECG::Images::triangle_hollow) ;
-            _state = GAME_LISTEN_B ;
+        case TEAM_A:
+            break ;
+        case LISTEN_B:
+            break ;
+        case TEAM_B:
+            broadcastSignal(SIG_B) ;
+        default:
             break ;
     }
 }
 
 void UserNode::onButtonBUp(MicroBitEvent e) {
     switch(_state) {
-        case DEMO:
-            uBit.display.print("B") ;
+        case UNASSIGNED:
             break ;
-        case GAME_LISTEN_B:
-            uBit.display.clear() ;
-            _state = GAME_UNASSIGNED ;
+        case LISTEN_A:
+            _state = UNASSIGNED ;
+        case TEAM_A:
+            break ;
+        case LISTEN_B:
+            break ;
+        case TEAM_B:
+            break ;
+        default:
             break ;
     }
 }
 
 void UserNode::onButtonABDown(MicroBitEvent e) {
-    switch(_state) {
-        case DEMO:
-            // TODO: make this block display
-            broadcastAnimation() ;
-            uBit.sleep(500) ;
-            downloadAnimation() ;
-            uBit.sleep(500) ;
-            break ;
-        case GAME_TEAM_A:
-            broadcastAnimation() ;
-            _sendPacketBuffer[0] = SIG_UA ;
-            uBit.radio.datagram.send(_recvPacketBuffer) ;
-            break ;
-        case GAME_TEAM_B:
-            broadcastAnimation() ;
-            _sendPacketBuffer[0] = SIG_UB ;
-            uBit.radio.datagram.send(_recvPacketBuffer) ;
-            break ;
-    }
-}
 
-void UserNode::loop() {
-    uBit.serial.printf("state = %d\r\n", _state) ;
-    uBit.sleep(1000) ;
-
-    // Execution path of this loop depends on state
-    switch (_state) {
-        case DEMO:
-            uBit.serial.printf("in demo state\r\n") ;
-            break ;
-        case MESSAGE:
-            uBit.serial.printf("in message state\r\n") ;
-            break ;
-        case LISTEN:
-            uBit.serial.printf("in listen state\r\n") ;
-            break ;
-        case GAME_UNASSIGNED:
-            uBit.serial.printf("in Game Unassigned state\r\n") ;
-            break ;
-        case GAME_LISTEN_A:
-            uBit.serial.printf("in Game Listen A state\r\n") ;
-            break ;
-        case GAME_LISTEN_B:
-            uBit.serial.printf("in Game Listen B state\r\n") ;
-            break ;
-        case GAME_TEAM_A:
-            uBit.serial.printf("in Game Team A state\r\n") ;
-            uBit.display.print(ECG::Images::square_filled) ;
-            break ;
-        case GAME_TEAM_B:
-            uBit.serial.printf("in Game Team B state\r\n") ;
-            uBit.display.print(ECG::Images::square_filled) ;
-            break ;
-        default:
-            // Don't do anything
-            break ;
-    }
 }
 
 void UserNode::onDatagramRecipt(MicroBitEvent e) {
-    uBit.serial.printf("data detected\r\n") ;
 
-    // Extract signal from received packet
-    _recvPacketBuffer = uBit.radio.datagram.recv() ;
+    // Radio signal handling is state-dependent
+    switch(_state) {
 
-    int signal = _recvPacketBuffer[0] ;
-
-    switch(signal) {
-        // Reset and demo are essentially the same
-        case SIG_RR:
-        case SIG_RD:
-            uBit.display.clear() ;
-            _state = DEMO ;
+        // All deprecated signals will reset the devices
+        case SIG_R:
+            uBit.serial.printf("GOT SIG_R\r\n") ;
+            _state = UNASSIGNED ;
             break ;
-        // Ending the game just switches player to listen mode
-        case SIG_RL :
-        case SIG_RGG:
-            _state = LISTEN ;
-            break ;
-        case SIG_RMSG:
-            _state = MESSAGE ;
-            uBit.display.scroll(_strMsg) ;
-            break ;
-        // Un-assigning a node is the same as starting a new game for them
-        // If they are listening, that is
-        case SIG_RU:
-            if (_state != GAME_LISTEN_A && _state != GAME_LISTEN_B) {
-                break ;
-            }
-            else {
-                // Fall through to next case
+        case SIG_A:
+            uBit.serial.printf("GOT SIG_A\r\n") ;
+            if (_state == LISTEN_A) {
+                _state = TEAM_A ;
             }
             break ;
-        case SIG_RNG:
-            _state = LISTEN ;
-            newGameAnimation() ;
-            _state = GAME_UNASSIGNED ;
-            break ;
-        case SIG_UA:
-            if (_state == GAME_LISTEN_A) {
-                _state = GAME_TEAM_A ;
-            }
-            else {
-                // If they do not consent to conversion, tolerate it
-            }
-            break ;
-        case SIG_UB:
-            if (_state == GAME_LISTEN_B) {
-                _state = GAME_TEAM_B ;
+        case SIG_B:
+            uBit.serial.printf("GOT SIG_B\r\n") ;
+            if (_state = LISTEN_B) {
+                _state = TEAM_B ;
             }
             break ;
         default:
-            uBit.serial.printf("Unknown signal received, ask devs to investigate.\r\n") ;
             break ;
     }
 }
 
 void UserNode::broadcastAnimation(int msDelay) {
 
-   uBit.display.print(ECG::Images::centerRing) ;
-   uBit.sleep(msDelay) ;
+    // This function will block the scheduler until complete
+    // in order to delay repeated signal broadcasts
 
-   uBit.display.print(ECG::Images::middleRing) ;
-   uBit.sleep(msDelay) ;
+    uBit.display.print(ECG::Images::centerRing) ;
+    wait_ms(msDelay) ;
 
-   uBit.display.print(ECG::Images::outerRing) ;
-   uBit.sleep(msDelay) ;
+    uBit.display.print(ECG::Images::middleRing) ;
+    wait_ms(msDelay) ;
+
+    uBit.display.print(ECG::Images::outerRing) ;
+    wait_ms(msDelay) ;
 }
 
 void UserNode::broadcastAnimation() {
     broadcastAnimation(DEFAULT_ANIMATION_DELAY) ;
 }
 
-void UserNode::downloadAnimation(int msDelay) {
+void UserNode::waitingForInputAnimation(int msDelay) {
+    uBit.display.printAsync(ECG::Images::loading1) ;
+    uBit.sleep(msDelay) ;
 
-   uBit.display.print(ECG::Images::outerRing) ;
-   uBit.sleep(msDelay) ;
+    uBit.display.printAsync(ECG::Images::loading2) ;
+    uBit.sleep(msDelay) ;
 
-   uBit.display.print(ECG::Images::middleRing) ;
-   uBit.sleep(msDelay) ;
+    uBit.display.printAsync(ECG::Images::loading3) ;
+    uBit.sleep(msDelay) ;
 
-   uBit.display.print(ECG::Images::centerRing) ;
-   uBit.sleep(msDelay) ;
+    uBit.display.printAsync(ECG::Images::loading4) ;
+    uBit.sleep(msDelay) ;
 }
 
-void UserNode::downloadAnimation() {
-    downloadAnimation(DEFAULT_ANIMATION_DELAY) ;
+void UserNode::waitingForInputAnimation() {
+    waitingForInputAnimation(DEFAULT_ANIMATION_DELAY) ;
 }
 
-void UserNode::newGameAnimation(int msDelay) {
-
-    // TODO: consider the order of this animation
-
-    uBit.display.print(ECG::Images::square_hollow) ;
-    uBit.sleep(msDelay) ;
-    uBit.display.print(ECG::Images::left_arrow) ;
-    uBit.sleep(msDelay) ;
-    uBit.display.print("A") ;
-    uBit.sleep(msDelay) ;
-    uBit.display.print(ECG::Images::square_filled) ;
-    uBit.sleep(msDelay) ;
-
-    uBit.display.print("&") ;
-    uBit.sleep(msDelay) ;
-
-    uBit.display.print(ECG::Images::triangle_hollow) ;
-    uBit.sleep(msDelay) ;
-    uBit.display.print(ECG::Images::right_arrow) ;
-    uBit.sleep(msDelay) ;
-    uBit.display.print("B") ;
-    uBit.sleep(msDelay) ;
-    uBit.display.print(ECG::Images::triangle_filled) ;
-    uBit.sleep(msDelay) ;
-
-    uBit.display.scroll("Go!") ;
-    uBit.sleep(msDelay) ;
-    uBit.display.clear() ;
-
-}
-
-void UserNode::newGameAnimation() {
-    // Default delay for instructions will be one second
-    newGameAnimation(1000) ;
+void UserNode::loop() {
+    switch(_state) {
+        case UNASSIGNED:
+            uBit.serial.printf("in U\r\n") ;
+            waitingForInputAnimation() ;
+            break ;
+        case LISTEN_A:
+            uBit.serial.printf("in LA\r\n") ;
+            uBit.display.print("a") ;
+            break ;
+        case LISTEN_B:
+            uBit.serial.printf("in LB\r\n") ;
+            uBit.display.print("b") ;
+            break ;
+        case TEAM_A:
+            uBit.serial.printf("in TA\r\n") ;
+            uBit.display.print("A") ;
+            break ;
+        case TEAM_B:
+            uBit.serial.printf("in TB\r\n") ;
+            uBit.display.print("B") ;
+            break ;
+        default:
+            break ;
+    }
+    uBit.sleep(1000) ;
 }

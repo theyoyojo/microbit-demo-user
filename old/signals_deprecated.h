@@ -22,33 +22,41 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-/*
-    This header filed declares references to a a number of useful
-    MicroBitImage objects. 
-*/
+#ifndef SIGNALS_H
+#define SIGNALS_H
 
-#ifndef IMAGES_H
-#define IMAGES_H "images.h"
+// Definition of signals for upcoming demo system
+// See specification for more information
 
-#include "MicroBitImage.h"
+// Root signals
 
-namespace ECG {
+// Reset all nodes to boot state (DEMO)
+#define SIG_RR 0
 
-struct Images {
+// Set all nodes to DEMO state
+#define SIG_RD 1
 
-// Stages of broadcast/download animation
-static MicroBitImage& centerRing ;
-static MicroBitImage& middleRing ;
-static MicroBitImage& outerRing ;
+// Set all nodes to LISTEN state
+#define SIG_RL 2
 
-// Stages of loading animation
-static MicroBitImage& loading1 ;
-static MicroBitImage& loading2 ;
-static MicroBitImage& loading3 ;
-static MicroBitImage& loading4 ;
+// Set all nodes to MESSAGE state (display their welcome message)
+#define SIG_RMSG 3
 
-} ; // struct Images
+// Begin an new game on the network (Set all nodes to GAME_UNASSIGNED state)
+#define SIG_RNG 4
 
-} // namespace ECG
+// End the network's current game (Set all nodes to LISTEN state)
+#define SIG_RGG 5
 
-#endif // IMAGES_H
+// Unassign an assigned node if they are listening for the signal
+#define SIG_RU 6
+
+// User signals
+
+// Set all devices in GAME_LISTEN_A state to GAME_TEAM_A state
+#define SIG_UA 100
+
+// Set all devices in GAME_LISTEN_B state to GAME_TEAM_B state
+#define SIG_UB 101
+
+#endif // SIGNALS_H

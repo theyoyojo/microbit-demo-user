@@ -27,11 +27,12 @@ DEALINGS IN THE SOFTWARE.
 
 #include "MicroBit.h"
 
+// User Node states
+// Deprecated: DEMO, MESSAGE, LISTEN
 typedef enum nodeState {
-    DEMO, MESSAGE, LISTEN,
-    GAME_UNASSIGNED,
-    GAME_LISTEN_A, GAME_TEAM_A,
-    GAME_LISTEN_B, GAME_TEAM_B
+    UNASSIGNED,
+    LISTEN_A, TEAM_A,
+    LISTEN_B, TEAM_B
 } NodeState ;
 
 namespace ECG {
@@ -40,15 +41,14 @@ class UserNode {
 
 private:
 
+// The current state of the node
 static NodeState _state ;
 
+// A packet buffer for incomming transmissions
 static PacketBuffer _recvPacketBuffer ;
 
+// A packet buffer for outgoing transmissions
 static PacketBuffer _sendPacketBuffer ;
-
-static const char * _charMsg ;
-
-static ManagedString _strMsg ;
 
 public:
 
@@ -59,36 +59,63 @@ public:
 
     /**
       * Event handler for A-D
+      * 
+      * @param e: An object representing the raised event passed
+      * to the function via the messageBus
       */
     void onButtonADown(MicroBitEvent e) ;
 
     /**
       * Event handler for A-U
+      * 
+      * @param e: An object representing the raised event passed
+      * to the function via the messageBus
       */
     void onButtonAUp(MicroBitEvent e) ;
 
     /**
       * Event handler for B-D
+      * 
+      * @param e: An object representing the raised event passed
+      * to the function via the messageBus
       */
     void onButtonBDown(MicroBitEvent e) ;
 
     /**
       * Event handler for B-U
+      * 
+      * @param e: An object representing the raised event passed
+      * to the function via the messageBus
       */ 
     void onButtonBUp(MicroBitEvent e) ;
 
     /**
       * Event handler for B-D & A-D
+      * 
+      * @param e: An object representing the raised event passed
+      * to the function via the messageBus
       */
     void onButtonABDown(MicroBitEvent e) ;
 
     /**
       * Event handler for incomming datagrams
+      * 
+      * @param e: An object representing the raised event passed
+      * to the function via the messageBus
       */
     void onDatagramRecipt(MicroBitEvent e) ;
 
     /**
+      * Broadcast a signal to the network
+      * 
+      * @param sig: The signal to be broadcast (see signal.h)
+      */
+    void broadcastSignal(int sig) ;
+
+    /**
       * Display an animation to signify the execution of a broadcast
+      * 
+      * @param msDelay: A number of milliseconds toify the execution of a broadcast
       * 
       * @param msDelay: A number of milliseconds to pause between stages of the animation
       */
@@ -108,8 +135,8 @@ public:
       * 
       * @param msDelay: A number of milliseconds to pause between stages of the animation
       */
-    void newGameAnimation(int msDelay) ;
-    void newGameAnimation() ;
+    void waitingForInputAnimation(int msDelay) ;
+    void waitingForInputAnimation() ;
 
     /**
       * Primary execution loop called by main()
