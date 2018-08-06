@@ -50,6 +50,9 @@ static PacketBuffer _recvPacketBuffer ;
 // A packet buffer for outgoing transmissions
 static PacketBuffer _sendPacketBuffer ;
 
+// A counter to hold the unassigned animation frame number
+static int _nFrameLoadingAnimation;
+
 public:
 
     /**
@@ -121,6 +124,11 @@ public:
       */
     void broadcastAnimation(int msDelay) ;
     void broadcastAnimation() ;
+
+    /**
+      * Set the current loading animation frame to the next appropriate one
+      */
+    void incrementFrameLoadingAnimation() ;
 
     /**
       * Display an animation to instruct the user as to how to play the game

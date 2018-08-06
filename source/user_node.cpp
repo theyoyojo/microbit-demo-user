@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace ECG ;
 
+// Definition of static variables declared in user_node.h
+
 MicroBit uBit ;
 
 NodeState UserNode::_state ;
@@ -40,6 +42,9 @@ PacketBuffer UserNode::_recvPacketBuffer(1) ;
 
 PacketBuffer UserNode::_sendPacketBuffer(1) ;
 
+int UserNode::_nFrameLoadingAnimation ;
+
+// Implementation of user_node.h follows
 
 UserNode::UserNode() {
 
@@ -138,14 +143,17 @@ void UserNode::onButtonBUp(MicroBitEvent e) {
     }
 }
 
-void UserNode::onButtonABDown(MicroBitEvent e) {
-
-}
+// This handler currently does not do anything.
+void UserNode::onButtonABDown(MicroBitEvent e) {}
 
 void UserNode::onDatagramRecipt(MicroBitEvent e) {
 
-    // Radio signal handling is state-dependent
-    switch(_state) {
+    _recvPacketBuffer = uBit.radio.datagram.recv() ;
+
+    uBit.serial.printf("DATAGRAM RECEIVED! (%d)\r\n",
+    _recvPacketBuffer[0]) ;
+
+    switch(_recvPacketBuffer[0]) {
 
         case SIG_R:
             uBit.serial.printf("GOT SIG_R\r\n") ;
@@ -159,7 +167,7 @@ void UserNode::onDatagramRecipt(MicroBitEvent e) {
             break ;
         case SIG_B:
             uBit.serial.printf("GOT SIG_B\r\n") ;
-            if (_state = LISTEN_B) {
+            if (_state == LISTEN_B) {
                 _state = TEAM_B ;
             }
             break ;
@@ -187,27 +195,18 @@ void UserNode::broadcastAnimation() {
     broadcastAnimation(DEFAULT_ANIMATION_DELAY) ;
 }
 
+void UserNode::incrementFrameLoadingAnimation() {
+
+    // Prefix increment does the job as a side effect of the bounds check :)
+    if (++_nFrameLoadingAnimation >= ECG::Images::nLoadingAnimationFrames) {
+        _nFrameLoadingAnimation = 0 ;
+    }
+    uBit.serial.printf("Printed loading frame #%d\r\n",_nFrameLoadingAnimation) ;
+}
+
 void UserNode::waitingForInputAnimation(int msDelay) {
-    // TODO: refactor this garbage
-    if (_state != UNASSIGNED) return;
-    uBit.display.print(ECG::Images::loading1) ;
-    if (_state != UNASSIGNED) return;
-    uBit.sleep(msDelay) ;
-
-    if (_state != UNASSIGNED) return;
-    uBit.display.print(ECG::Images::loading2) ;
-    if (_state != UNASSIGNED) return;
-    uBit.sleep(msDelay) ;
-
-    if (_state != UNASSIGNED) return;
-    uBit.display.print(ECG::Images::loading3) ;
-    if (_state != UNASSIGNED) return;
-    uBit.sleep(msDelay) ;
-
-    if (_state != UNASSIGNED) return;
-    uBit.display.print(ECG::Images::loading4) ;
-    if (_state != UNASSIGNED) return;
-    uBit.sleep(msDelay) ;
+    incrementFrameLoadingAnimation() ;
+    uBit.display.print(ECG::Images::loading[_nFrameLoadingAnimation]) ;
 }
 
 void UserNode::waitingForInputAnimation() {
@@ -240,4 +239,6 @@ void UserNode::loop() {
             break ;
     }
     uBit.sleep(500) ;
+
+    uBit.serial.printf("radio.enable returns: (%d)\r\n",uBit.radio.enable()) ;
 }
