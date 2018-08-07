@@ -22,9 +22,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "user_node.h"
+/**
+  main.cpp
 
-// User Node
+  This file defines the main node object and calls the node's loop function.
+**/
+
+#include "user_node.h"
 
 int main() {
     ECG::UserNode node ;

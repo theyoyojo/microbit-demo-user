@@ -22,17 +22,27 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+/**
+  user_node.h
+
+  This file declares a class that represents the device and functionality of a network node
+  that is intended to be used as an interface to play the demonstration game
+  implemented by this project and it's root (network control) companion project.
+**/
+
 #ifndef USERNODE_H
 #define USERNODE_H "user_node.h"
 
 #include "MicroBit.h"
 
+// The boot state of the device should be UNASSGINED
+#define BOOT_STATE UNASSIGNED
+
 // User Node states
-// Deprecated: DEMO, MESSAGE, LISTEN
 typedef enum nodeState {
-    UNASSIGNED,
-    LISTEN_A, TEAM_A,
-    LISTEN_B, TEAM_B
+  UNASSIGNED,
+  LISTEN_A, TEAM_A,
+  LISTEN_B, TEAM_B
 } NodeState ;
 
 namespace ECG {
@@ -44,10 +54,10 @@ private:
 // The current state of the node
 static NodeState _state ;
 
-// A packet buffer for incomming transmissions
+// A packet buffer intended for incomming transmissions
 static PacketBuffer _recvPacketBuffer ;
 
-// A packet buffer for outgoing transmissions
+// A packet buffer indended for outgoing transmissions
 static PacketBuffer _sendPacketBuffer ;
 
 // A counter to hold the unassigned animation frame number
@@ -55,93 +65,89 @@ static int _iFrameLoadingAnimation;
 
 public:
 
-    /**
-      * Default constructor used to initialize device functions
-      */ 
-    UserNode() ;
+  /**
+    * Default constructor used to initialize device functions
+    */ 
+  UserNode() ;
 
-    /**
-      * Event handler for A-D
-      * 
-      * @param e: An object representing the raised event passed
-      * to the function via the messageBus
-      */
-    void onButtonADown(MicroBitEvent e) ;
+  /**
+    * Event handler for A-D
+    * 
+    * @param e: An object representing the raised event passed
+    * to the function via the messageBus
+    */
+  void onButtonADown(MicroBitEvent e) ;
 
-    /**
-      * Event handler for A-U
-      * 
-      * @param e: An object representing the raised event passed
-      * to the function via the messageBus
-      */
-    void onButtonAUp(MicroBitEvent e) ;
+  /**
+    * Event handler for A-U
+    * 
+    * @param e: An object representing the raised event passed
+    * to the function via the messageBus
+    */
+  void onButtonAUp(MicroBitEvent e) ;
 
-    /**
-      * Event handler for B-D
-      * 
-      * @param e: An object representing the raised event passed
-      * to the function via the messageBus
-      */
-    void onButtonBDown(MicroBitEvent e) ;
+  /**
+    * Event handler for B-D
+    * 
+    * @param e: An object representing the raised event passed
+    * to the function via the messageBus
+    */
+  void onButtonBDown(MicroBitEvent e) ;
 
-    /**
-      * Event handler for B-U
-      * 
-      * @param e: An object representing the raised event passed
-      * to the function via the messageBus
-      */ 
-    void onButtonBUp(MicroBitEvent e) ;
+  /**
+    * Event handler for B-U
+    * 
+    * @param e: An object representing the raised event passed
+    * to the function via the messageBus
+    */ 
+  void onButtonBUp(MicroBitEvent e) ;
 
-    /**
-      * Event handler for B-D & A-D
-      * 
-      * @param e: An object representing the raised event passed
-      * to the function via the messageBus
-      */
-    void onButtonABDown(MicroBitEvent e) ;
+  /**
+    * Event handler for incomming datagrams
+    * 
+    * @param e: An object representing the raised event passed
+    * to the function via the messageBus
+    */
+  void onDatagramRecipt(MicroBitEvent e) ;
 
-    /**
-      * Event handler for incomming datagrams
-      * 
-      * @param e: An object representing the raised event passed
-      * to the function via the messageBus
-      */
-    void onDatagramRecipt(MicroBitEvent e) ;
+  /**
+    * Broadcast a signal to the network. Use of this functionality
+    * has an artificial cooldown implemented in broadcastAnimation()
+    * 
+    * @param sig: The signal to be broadcast (see signal.h)
+    */
+  void broadcastSignal(int sig) ;
 
-    /**
-      * Broadcast a signal to the network
-      * 
-      * @param sig: The signal to be broadcast (see signal.h)
-      */
-    void broadcastSignal(int sig) ;
+  /**
+    * Display an animation to signify the execution of a broadcast.
+    * Blocks processor for the duration of the animation (param msDelay
+    * * ECG::Images:nFramesLoadingAnimation milliseconds, to be precise)
+    * In this version, that results in a 1.5 second artificial cooldown time to
+    * restrict spamming of the broadcast function.
+    * 
+    * @param msDelay: A number of milliseconds to pause between stages of the animation
+    */
+  void broadcastAnimation(int msDelay) ;
+  void broadcastAnimation() ;
 
-    /**
-      * Display an animation to signify the execution of a broadcast
-      * 
-      * @param msDelay: A number of milliseconds toify the execution of a broadcast
-      * 
-      * @param msDelay: A number of milliseconds to pause between stages of the animation
-      */
-    void broadcastAnimation(int msDelay) ;
-    void broadcastAnimation() ;
+  /**
+    * Set the current loading animation frame to the next appropriate one. Will wrap back
+    * to index 0 when the end is reached.
+    */
+  void incrementFrameLoadingAnimation() ;
 
-    /**
-      * Set the current loading animation frame to the next appropriate one
-      */
-    void incrementFrameLoadingAnimation() ;
+  /**
+    * Display an animation to instruct the user as to how to play the game
+    * 
+    * @param msDelay: A number of milliseconds to pause between stages of the animation
+    */
+  void waitingForInputAnimation(int msDelay) ;
+  void waitingForInputAnimation() ;
 
-    /**
-      * Display an animation to instruct the user as to how to play the game
-      * 
-      * @param msDelay: A number of milliseconds to pause between stages of the animation
-      */
-    void waitingForInputAnimation(int msDelay) ;
-    void waitingForInputAnimation() ;
-
-    /**
-      * Primary execution loop called by main()
-      */
-    void loop() ;
+  /**
+    * Primary execution loop called by main()
+    */
+  void loop() ;
 
 } ; // class UserNode
 

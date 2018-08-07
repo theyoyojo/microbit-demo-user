@@ -23,10 +23,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 /**
-    images.h
+  images.h
 
-    This file declares pointers to a number of useful
-    MicroBitImage object arrays and provides an interface for their use.
+  This file declares pointers to a number of useful
+  MicroBitImage object arrays and provides an interface for their use.
 **/
 
 #ifndef IMAGES_H
