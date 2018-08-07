@@ -64,7 +64,7 @@ UserNode::UserNode() {
   // All nodes boot to an unassigned state
   _state = UNASSIGNED ;
 
-  // Register button handlers
+  // Register button event handlers
 
   // Button A
   uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_DOWN,

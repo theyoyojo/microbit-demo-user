@@ -23,22 +23,26 @@ DEALINGS IN THE SOFTWARE.
 */
 
 /**
-    signals.h
+  signals.h
 
-    This file provides the definition of macros used to represent
-    signals sent between devices on the game network.
+  This file implements an enum that contains the definitions
+  of signals used on the network and a variable that contains the number of signals
 **/
 
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-// Reset all nodes to their default state (UNASSIGNED)
-#define SIG_R 0
+namespace ECG {
 
-// Set all devices in GAME_LISTEN_A state to GAME_TEAM_A state
-#define SIG_A 1
+typedef enum signal {
+  SIG_R, // Reset all nodes to their default state (UNASSIGNED)
+  SIG_A, // Set all devices in GAME_LISTEN_A state to GAME_TEAM_A state
+  SIG_B  // Set all devices in GAME_LISTEN_B state to GAME_TEAM_B state
+} Signal ;
 
-// Set all devices in GAME_LISTEN_B state to GAME_TEAM_B state
-#define SIG_B 2
+// The number of signals that exist in this system
+const int nSignals = 3 ;
+
+} // namespace ECG
 
 #endif // SIGNALS_H
