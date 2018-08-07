@@ -22,10 +22,19 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+/**
+   images.cpp
+
+   This file implements the animations declared in images.h
+**/
+
 #include "images.h"
 #include "MicroBitImage.h"
 
 using namespace ECG ;
+
+
+// Definition of MicroBitImage's that constitute MicroBitImage ringAnimation[]
 
 MicroBitImage _centerRing(
     "0,0,0,0,0\n"
@@ -50,6 +59,17 @@ MicroBitImage _outerRing(
     "255,0,0,0,255\n"
     "255,255,255,255,255\n"
 ) ;
+
+// Definition of array representing the expanding ring animation and an integer representing the number of frames
+
+MicroBitImage Images::ringAnimation[] = {
+    _centerRing,
+    _middleRing,
+    _outerRing
+} ; int Images::nFramesRingAnimation = 3 ;
+
+
+// Definition of MicroBitImage's that constitute MicroBitImage loadingAnimation[]
 
 MicroBitImage _loading0(
     "0,0,0,0,0\n"
@@ -83,22 +103,11 @@ MicroBitImage _loading3(
     "0,0,0,0,0\n"
 ) ;
 
-// Below, previously declared but undefined static
-// MicroBitImage&'s are given definitions tying them
-// to the representations above
+// Definition of array representing the spinning line animation and an integer representing the number of frames
 
-MicroBitImage& Images::centerRing = _centerRing ;
-MicroBitImage& Images::middleRing = _middleRing ;
-MicroBitImage& Images::outerRing = _outerRing ;
-
-// The loading animation is stored as an array
-
-MicroBitImage Images::loading[] = {
-    _loading0, // 1
-    _loading1, // 2
-    _loading2, // 3
-    _loading3  // 4
-    } ;
-
-// And so it follows... 4
-int Images::nLoadingAnimationFrames = 4 ;
+MicroBitImage Images::loadingAnimation[] = {
+    _loading0, 
+    _loading1,
+    _loading2,
+    _loading3
+} ; int Images::nFramesLoadingAnimation = 4 ;

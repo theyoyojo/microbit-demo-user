@@ -42,7 +42,7 @@ PacketBuffer UserNode::_recvPacketBuffer(1) ;
 
 PacketBuffer UserNode::_sendPacketBuffer(1) ;
 
-int UserNode::_nFrameLoadingAnimation ;
+int UserNode::_iFrameLoadingAnimation ;
 
 // Implementation of user_node.h follows
 
@@ -178,17 +178,18 @@ void UserNode::onDatagramRecipt(MicroBitEvent e) {
 
 void UserNode::broadcastAnimation(int msDelay) {
 
-    // This function will block the scheduler until complete
-    // in order to delay repeated signal broadcasts
+    /*
+    This function will block the processor until complete
+    in order to delay repeated signal broadcasts
 
-    uBit.display.print(ECG::Images::centerRing) ;
-    wait_ms(msDelay) ;
+    In addition, this function is also the only one to bypass the device abstraction layer
+    and directly access the mbed api (via wait_api.h, included above)
+    */
 
-    uBit.display.print(ECG::Images::middleRing) ;
-    wait_ms(msDelay) ;
-
-    uBit.display.print(ECG::Images::outerRing) ;
-    wait_ms(msDelay) ;
+    for (int i = 0; i < ECG::Images::nFramesRingAnimation; i++) {
+        uBit.display.print(ECG::Images::ringAnimation[i]) ;
+        wait_ms(msDelay) ;
+    }
 }
 
 void UserNode::broadcastAnimation() {
@@ -198,15 +199,15 @@ void UserNode::broadcastAnimation() {
 void UserNode::incrementFrameLoadingAnimation() {
 
     // Prefix increment does the job as a side effect of the bounds check :)
-    if (++_nFrameLoadingAnimation >= ECG::Images::nLoadingAnimationFrames) {
-        _nFrameLoadingAnimation = 0 ;
+    if (++_iFrameLoadingAnimation >= ECG::Images::nFramesLoadingAnimation) {
+        _iFrameLoadingAnimation = 0 ;
     }
-    uBit.serial.printf("Printed loading frame #%d\r\n",_nFrameLoadingAnimation) ;
+    uBit.serial.printf("Printed loadingAnimation frame #%d\r\n",_iFrameLoadingAnimation) ;
 }
 
 void UserNode::waitingForInputAnimation(int msDelay) {
     incrementFrameLoadingAnimation() ;
-    uBit.display.print(ECG::Images::loading[_nFrameLoadingAnimation]) ;
+    uBit.display.print(ECG::Images::loadingAnimation[_iFrameLoadingAnimation]) ;
 }
 
 void UserNode::waitingForInputAnimation() {

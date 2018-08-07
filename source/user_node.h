@@ -51,7 +51,7 @@ static PacketBuffer _recvPacketBuffer ;
 static PacketBuffer _sendPacketBuffer ;
 
 // A counter to hold the unassigned animation frame number
-static int _nFrameLoadingAnimation;
+static int _iFrameLoadingAnimation;
 
 public:
 

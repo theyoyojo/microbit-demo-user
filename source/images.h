@@ -22,10 +22,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-/*
-    This header filed declares references to a a number of useful
-    MicroBitImage objects. 
-*/
+/**
+    images.h
+
+    This file declares pointers to a number of useful
+    MicroBitImage object arrays and provides an interface for their use.
+**/
 
 #ifndef IMAGES_H
 #define IMAGES_H "images.h"
@@ -34,15 +36,27 @@ DEALINGS IN THE SOFTWARE.
 
 namespace ECG {
 
+// As this is essentially a public image library, I used a struct to default all members to public
 struct Images {
 
-// Stages of broadcast/download animation
-static MicroBitImage& centerRing ;
-static MicroBitImage& middleRing ;
-static MicroBitImage& outerRing ;
 
-static MicroBitImage loading[];
-static int nLoadingAnimationFrames ;
+// Ring growing from center animation
+
+// Array of images in animation
+static MicroBitImage ringAnimation[] ;
+
+// Number of images in animation
+static int nFramesRingAnimation ;
+
+
+// Small spinning line in center animation
+
+// Array of images in animation
+static MicroBitImage loadingAnimation[] ;
+
+// Number of images in animation
+static int nFramesLoadingAnimation ;
+
 
 } ; // struct Images
 

@@ -22,13 +22,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+/**
+    signals.h
+
+    This file provides the definition of macros used to represent
+    signals sent between devices on the game network.
+
+    See specification for more information.
+    TODO: write a better specification.
+**/
+
 #ifndef SIGNALS_H
 #define SIGNALS_H
 
-// Definition of signals for upcoming demo system
-// See specification for more information
-
-// Reset all nodes to boot state (DEMO)
+// Reset all nodes to their default state (UNASSIGNED)
 #define SIG_R 0
 
 // Set all devices in GAME_LISTEN_A state to GAME_TEAM_A state
