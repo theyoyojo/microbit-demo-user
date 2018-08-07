@@ -2,6 +2,8 @@
 
 A component of a micro:bit demonstration. Code for a user's node.
 
+[The other component](https://github.com/theyoyojo/microbit-demo-root)
+
 ### How to compile and install:
 
 See [this Google doc](https://docs.google.com/document/d/1ZT9YcPsR-To2kQpRb6Q6RIYCqXsT9LDIWzZImJKM-Wg/edit) for instructions.

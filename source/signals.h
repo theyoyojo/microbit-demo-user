@@ -27,9 +27,6 @@ DEALINGS IN THE SOFTWARE.
 
     This file provides the definition of macros used to represent
     signals sent between devices on the game network.
-
-    See specification for more information.
-    TODO: write a better specification.
 **/
 
 #ifndef SIGNALS_H

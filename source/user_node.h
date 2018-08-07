@@ -25,9 +25,9 @@ DEALINGS IN THE SOFTWARE.
 /**
   user_node.h
 
-  This file declares a class that represents the device and functionality of a network node
-  that is intended to be used as an interface to play the demonstration game
-  implemented by this project and it's root (network control) companion project.
+  This file declares a class that represents the device and functionality of a 
+  network node that is intended to be used as an interface to play the demonstration
+  game implemented by this project and it's root (network control) companion project.
 **/
 
 #ifndef USERNODE_H
@@ -125,21 +125,23 @@ public:
     * In this version, that results in a 1.5 second artificial cooldown time to
     * restrict spamming of the broadcast function.
     * 
-    * @param msDelay: A number of milliseconds to pause between stages of the animation
+    * @param msDelay: A number of milliseconds to pause between stages of the
+    * animation
     */
   void broadcastAnimation(int msDelay) ;
   void broadcastAnimation() ;
 
   /**
-    * Set the current loading animation frame to the next appropriate one. Will wrap back
-    * to index 0 when the end is reached.
+    * Set the current loading animation frame to the next appropriate one. Will wrap
+    * back to index 0 when the end is reached.
     */
   void incrementFrameLoadingAnimation() ;
 
   /**
     * Display an animation to instruct the user as to how to play the game
     * 
-    * @param msDelay: A number of milliseconds to pause between stages of the animation
+    * @param msDelay: A number of milliseconds to pause between stages of the
+    * animation
     */
   void waitingForInputAnimation(int msDelay) ;
   void waitingForInputAnimation() ;

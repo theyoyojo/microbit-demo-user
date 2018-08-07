@@ -229,8 +229,8 @@ void UserNode::broadcastAnimation(int msDelay) {
   This function will block the processor until complete
   in order to delay repeated signal broadcasts
 
-  In addition, this function is also the only one to bypass the device abstraction layer
-  and directly access the mbed api (via wait_api.h, included above)
+  In addition, this function is also the only one to bypass the device abstraction
+  layer and directly access the mbed api (via wait_api.h, included above)
   */
 
   for (int i = 0; i < ECG::Images::nFramesRingAnimation; i++) {
