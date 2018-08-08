@@ -41,7 +41,7 @@ typedef enum signal {
 } Signal ;
 
 // The number of signals that exist in this system
-const int nSignals = 3 ;
+int const nSignals = 3 ;
 
 } // namespace ECG
 

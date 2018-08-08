@@ -33,55 +33,57 @@ DEALINGS IN THE SOFTWARE.
 #include "images.h"
 #include "wait_api.h"
 
-// Time in ms to wait between iterations of loop()
-#define LOOP_DELAY 500
-
-// Default delay for animations
-#define DEFAULT_ANIMATION_DELAY LOOP_DELAY
-
 using namespace ECG ;
 
 // Definition of static variables declared in user_node.h
 
-MicroBit uBit ;
+MicroBit UserNode::_uBit ;
 
 NodeState UserNode::_state ;
+
+NodeState const UserNode::_bootState = UNASSIGNED ;
+
+int const UserNode::_msDeviceTick = 10 ; // milliseconds
 
 PacketBuffer UserNode::_recvPacketBuffer(1) ;
 
 PacketBuffer UserNode::_sendPacketBuffer(1) ;
 
-int UserNode::_iFrameLoadingAnimation ;
+int UserNode::_iTickLoadingAnimation;
+
+int const UserNode::_ticksPerFrameLoadingAnimation = 50 ; // ticks/frames
+
+int const UserNode::_msPerFrameBroadcastAnimation = 500 ; // milliseconds
 
 // Implementation of constructor
 
 UserNode::UserNode() {
 
   // Device initialization
-  uBit.init() ;
-  uBit.radio.enable() ;
+  _uBit.init() ;
+  _uBit.radio.enable() ;
 
-  // All nodes boot to an unassigned state
-  _state = UNASSIGNED ;
+  // Set the device state to it's boot state (as it just booted)
+  _state = _bootState ;
 
   // Register button event handlers
 
   // Button A
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_DOWN,
+  _uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_DOWN,
    this, &UserNode::onButtonADown) ;
 
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_UP,
+  _uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_UP,
   this, &UserNode::onButtonAUp) ;
 
   // Button B
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_DOWN,
+  _uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_DOWN,
   this, &UserNode::onButtonBDown) ;
 
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_UP,
+  _uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_UP,
   this, &UserNode::onButtonBUp) ;
 
   // Register radio signal handler
-  uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM,
+  _uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM,
   this, &UserNode::onDatagramRecipt) ;
 }
 
@@ -91,7 +93,7 @@ void UserNode::broadcastSignal(int sig) {
   _sendPacketBuffer[0] = sig ;
 
   // Send it.
-  uBit.radio.datagram.send(_sendPacketBuffer) ;
+  _uBit.radio.datagram.send(_sendPacketBuffer) ;
 
   // Display an animation to the user and simultaneously restrict user
   // input as described in header
@@ -191,28 +193,28 @@ void UserNode::onButtonBUp(MicroBitEvent e) {
 
 void UserNode::onDatagramRecipt(MicroBitEvent e) {
 
-  _recvPacketBuffer = uBit.radio.datagram.recv() ;
+  _recvPacketBuffer = _uBit.radio.datagram.recv() ;
 
-  uBit.serial.printf("DATAGRAM RECEIVED! (%d)\r\n",
+  _uBit.serial.printf("DATAGRAM RECEIVED! (%d)\r\n",
   _recvPacketBuffer[0]) ;
 
   // Unlike the other event handlers, the actions of this function
   // are dependant on the signal received first and the state second
   switch(_recvPacketBuffer[0]) {
     case SIG_R:
-      uBit.serial.printf("GOT SIG_R\r\n") ;
+      _uBit.serial.printf("GOT SIG_R\r\n") ;
       // On recipt of the reset signal, the device should reset to the boot state
-      _state = BOOT_STATE ;
+      _state = _bootState;
       break ;
     case SIG_A:
-      uBit.serial.printf("GOT SIG_A\r\n") ;
+      _uBit.serial.printf("GOT SIG_A\r\n") ;
       // State transition from LISTEN_A to TEAM_A on event SIG_A received
       if (_state == LISTEN_A) {
         _state = TEAM_A ;
       }
       break ;
     case SIG_B:
-      uBit.serial.printf("GOT SIG_B\r\n") ;
+      _uBit.serial.printf("GOT SIG_B\r\n") ;
       // State transition from LISTEN_B to TEAM_B on event SIG_B received
       if (_state == LISTEN_B) {
         _state = TEAM_B ;
@@ -223,7 +225,7 @@ void UserNode::onDatagramRecipt(MicroBitEvent e) {
   }
 }
 
-void UserNode::broadcastAnimation(int msDelay) {
+void UserNode::broadcastAnimation() {
 
   /*
   This function will block the processor until complete
@@ -234,25 +236,12 @@ void UserNode::broadcastAnimation(int msDelay) {
   */
 
   for (int i = 0; i < ECG::Images::nFramesRingAnimation; i++) {
-    uBit.display.print(ECG::Images::ringAnimation[i]) ;
-    wait_ms(msDelay) ;
+    _uBit.display.print(ECG::Images::ringAnimation[i]) ;
+    wait_ms(_msPerFrameBroadcastAnimation) ;
   }
 }
 
-void UserNode::broadcastAnimation() {
-  broadcastAnimation(DEFAULT_ANIMATION_DELAY) ;
-}
-
-void UserNode::incrementFrameLoadingAnimation() {
-
-  // Prefix increment does the job as a side effect of the bounds check :)
-  if (++_iFrameLoadingAnimation >= ECG::Images::nFramesLoadingAnimation) {
-    _iFrameLoadingAnimation = 0 ;
-  }
-  uBit.serial.printf("Printed loadingAnimation frame #%d\r\n",_iFrameLoadingAnimation) ;
-}
-
-void UserNode::waitingForInputAnimation(int msDelay) {
+void UserNode::updateLoadingAnimation() {
 
   /*
   Instead of printing the entire animation at once, each call to this function
@@ -260,39 +249,35 @@ void UserNode::waitingForInputAnimation(int msDelay) {
   as soon as possible and act on new user input
   */
 
-  incrementFrameLoadingAnimation() ;
-  uBit.display.print(ECG::Images::loadingAnimation[_iFrameLoadingAnimation]) ;
-}
+  if (++_iTickLoadingAnimation >= ECG::Images::nFramesLoadingAnimation * _ticksPerFrameLoadingAnimation ) {
+    _iTickLoadingAnimation = 0 ;
+  }
 
-void UserNode::waitingForInputAnimation() {
-  waitingForInputAnimation(DEFAULT_ANIMATION_DELAY) ;
+  _uBit.display.print(ECG::Images::loadingAnimation[_iTickLoadingAnimation / _ticksPerFrameLoadingAnimation]) ;
 }
 
 void UserNode::loop() {
   switch(_state) {
     case UNASSIGNED:
-      uBit.serial.printf("in U\r\n") ;
-      waitingForInputAnimation() ;
+      updateLoadingAnimation() ;
       break ;
     case LISTEN_A:
-      uBit.serial.printf("in LA\r\n") ;
-      uBit.display.print("a") ;
+      _uBit.display.print("a") ;
       break ;
     case LISTEN_B:
-      uBit.serial.printf("in LB\r\n") ;
-      uBit.display.print("b") ;
+      _uBit.display.print("b") ;
       break ;
     case TEAM_A:
-      uBit.serial.printf("in TA\r\n") ;
-      uBit.display.print("A") ;
+      _uBit.display.print("A") ;
       break ;
     case TEAM_B:
-      uBit.serial.printf("in TB\r\n") ;
-      uBit.display.print("B") ;
+      _uBit.display.print("B") ;
       break ;
     default:
-    break ;
+      break ;
   }
 
-  uBit.sleep(LOOP_DELAY) ;
+  // TODO: printf state every n ticks?
+
+  _uBit.sleep(_msDeviceTick) ;
 }

@@ -35,9 +35,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include "MicroBit.h"
 
-// The boot state of the device should be UNASSGINED
-#define BOOT_STATE UNASSIGNED
-
 // User Node states
 typedef enum nodeState {
   UNASSIGNED,
@@ -51,8 +48,17 @@ class UserNode {
 
 private:
 
+// An abstraction of the device functionality provided by the API
+static MicroBit _uBit ;
+
 // The current state of the node
 static NodeState _state ;
+
+// The initial and default state of the device
+static NodeState const _bootState ;
+
+// The number of milliseconds to wait between each iteration of the main device loop
+static int const _msDeviceTick ;
 
 // A packet buffer intended for incomming transmissions
 static PacketBuffer _recvPacketBuffer ;
@@ -60,8 +66,15 @@ static PacketBuffer _recvPacketBuffer ;
 // A packet buffer indended for outgoing transmissions
 static PacketBuffer _sendPacketBuffer ;
 
-// A counter to hold the unassigned animation frame number
-static int _iFrameLoadingAnimation;
+// The position of the device in the loading animation, in ticks
+static int _iTickLoadingAnimation ;
+
+// The number of device ticks that each frame in the loading animation is shown for
+static int const _ticksPerFrameLoadingAnimation ;
+
+// The number of milleseconds to wait between moving to the next frame
+// in the broadcast animation
+static int const _msPerFrameBroadcastAnimation ;
 
 public:
 
@@ -120,31 +133,18 @@ public:
 
   /**
     * Display an animation to signify the execution of a broadcast.
-    * Blocks processor for the duration of the animation (param msDelay
-    * * ECG::Images:nFramesLoadingAnimation milliseconds, to be precise)
+    * Blocks processor for the duration of the animation.
+    * param msDelay * ECG::Images:nFramesLoadingAnimation milliseconds (to be precise)
     * In this version, that results in a 1.5 second artificial cooldown time to
     * restrict spamming of the broadcast function.
-    * 
-    * @param msDelay: A number of milliseconds to pause between stages of the
-    * animation
     */
-  void broadcastAnimation(int msDelay) ;
   void broadcastAnimation() ;
 
   /**
-    * Set the current loading animation frame to the next appropriate one. Will wrap
-    * back to index 0 when the end is reached.
+    * Update the display to show the appropriate frame of an animation to indicate the
+    * device being in a state of waiting for input. Looks like a loading animation.
     */
-  void incrementFrameLoadingAnimation() ;
-
-  /**
-    * Display an animation to instruct the user as to how to play the game
-    * 
-    * @param msDelay: A number of milliseconds to pause between stages of the
-    * animation
-    */
-  void waitingForInputAnimation(int msDelay) ;
-  void waitingForInputAnimation() ;
+  void updateLoadingAnimation() ;
 
   /**
     * Primary execution loop called by main()
