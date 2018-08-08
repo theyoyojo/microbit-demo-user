@@ -30,7 +30,9 @@ DEALINGS IN THE SOFTWARE.
 
 #include "user_node.h"
 
+// User Node entry point
 int main() {
+
     ECG::UserNode node ;
 
     while(1) {
