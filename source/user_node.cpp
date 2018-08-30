@@ -49,7 +49,7 @@ PacketBuffer UserNode::_recvPacketBuffer(1) ;
 
 PacketBuffer UserNode::_sendPacketBuffer(1) ;
 
-int UserNode::_iTickLoadingAnimation;
+unsigned int UserNode::_iTickLoadingAnimation = 0;
 
 int const UserNode::_ticksPerFrameLoadingAnimation = 50 ; // ticks/frames
 

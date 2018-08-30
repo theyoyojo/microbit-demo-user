@@ -67,7 +67,7 @@ static PacketBuffer _recvPacketBuffer ;
 static PacketBuffer _sendPacketBuffer ;
 
 // The position of the device in the loading animation, in ticks
-static int _iTickLoadingAnimation ;
+static unsigned int _iTickLoadingAnimation ;
 
 // The number of device ticks that each frame in the loading animation is shown for
 static int const _ticksPerFrameLoadingAnimation ;
