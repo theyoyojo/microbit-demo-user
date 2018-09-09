@@ -153,6 +153,6 @@ public:
 
 } ; // class UserNode
 
-} // namspace ECG
+} // namespace ECG
 
 #endif // USERNODE_H
